@@ -1,2 +1,6 @@
 # exclude livecoded-api-server
+.gitignore
 livecoded-api-server/
+tests/
+venv/
+__pycache__/
