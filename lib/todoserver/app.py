@@ -15,6 +15,10 @@ class TodoserverApp(Flask):
         self.store = TaskStore()
         super().__init__(name)
         
+    def erase_all_test_data(self):
+        assert self.testing # if true, TEST MODE; otherwise PROD MODE *BOMB*
+        self.store.tasks.clear()
+        
 app = TodoserverApp(__name__)
 
 @app.route("/tasks/", methods=["GET"])
