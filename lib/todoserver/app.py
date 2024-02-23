@@ -1,6 +1,11 @@
 #todoserver\app.py
 
-from flask import Flask, make_response, request
+from flask import (
+    Flask,
+    make_response,
+    request,
+)
+
 import json
 
 app = Flask(__name__)
@@ -10,7 +15,8 @@ MEMORY = {}
 
 @app.route("/tasks/", methods=["GET"])
 def get_all_tasks():
-    tasks = [{"id": task_id, "summary": task["summary"]} for task_id, task in MEMORY.items()]
+    tasks = [{"id": task_id, "summary": task["summary"]} 
+            for task_id, task in MEMORY.items()]
     return make_response(json.dumps(tasks), 200)
 
 @app.route("/tasks/", methods=["POST"])
