@@ -1,5 +1,7 @@
 # exclude livecoded-api-server
 .gitignore
+act.bat
+dact.bat
 livecoded-api-server/
 tests/
 venv/
