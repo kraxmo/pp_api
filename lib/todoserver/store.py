@@ -38,7 +38,8 @@ class TaskStore():
         return task.id
     
     def task_details(self, task_id):
-        task = self.Session().query(Task).get(task_id)
+        #task = self.Session().query(Task).get(task_id) #SQLAlchemy 1.x
+        task = self.Session().get(Task, task_id)        #SQLAlchemy 2.0
         return {
             "id": task.id,
             "summary": task.summary,
