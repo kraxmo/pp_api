@@ -11,13 +11,12 @@ from flask import (
 from .store import TaskStore
 
 class TodoserverApp(Flask):
-    def __init__(self, name):
-        self.store = TaskStore()
-        super().__init__(name)
-        
+    def init_db(self, engine_spec):
+        self.store = TaskStore(engine_spec)
+
     def erase_all_test_data(self):
         assert self.testing # if true, TEST MODE; otherwise PROD MODE *BOMB*
-        self.store.tasks.clear()
+        self.store._delete_all_tasks()
         
 app = TodoserverApp(__name__)
 
@@ -38,5 +37,5 @@ def create_task():
 
 @app.route("/tasks/<int:task_id>/")
 def task_details(task_id):
-    task_info = app.store.task_detail(task_id)
+    task_info = app.store.task_details(task_id)
     return json.dumps(task_info)
