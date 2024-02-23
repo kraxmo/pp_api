@@ -1,4 +1,4 @@
-#todoserver.py
+#todoserver\__init__.py
 
 from flask import Flask, make_response, request
 import json
