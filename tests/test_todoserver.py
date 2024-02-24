@@ -5,7 +5,7 @@ from todoserver import app
 app.testing = True # provide more troubleshooting output (DEV only)
 app.init_db("sqlite:///:memory:") # creates an sqlite in-memory database
 
-def json_body(resp): # helper function
+def json_body(resp): # helper function to convert response into dictionary
     """Convert native bytestring to string for json"""
     return json.loads(resp.data.decode("utf-8"))
 
@@ -16,7 +16,7 @@ class TestTodoserver(unittest.TestCase):
         # verify test pre-conditions
         resp = self.client.get("/tasks/")
         self.assertEqual(200, resp.status_code)
-        self.assertEqual([], json_body(resp))
+        self.assertEqual([], json_body(resp))   # convert response into dictionary
         
     def test_create_a_task_and_get_its_details(self):
         # create new task
@@ -26,13 +26,13 @@ class TestTodoserver(unittest.TestCase):
         }
         resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
         self.assertEqual(201, resp.status_code)
-        data = json_body(resp)
+        data = json_body(resp)  # convert response into dictionary
         self.assertIn("id", data)
         # get task details
         task_id = data["id"]
         resp = self.client.get("/tasks/{:d}/".format(task_id))
         self.assertEqual(200, resp.status_code)
-        task = json_body(resp)  # get dictionary of response items
+        task = json_body(resp)  # convert response into dictionary
         self.assertEqual(task_id, task["id"])
         self.assertEqual("Get milk", task["summary"])
         self.assertEqual("One gallon organic whole milk", task["description"])
@@ -50,7 +50,7 @@ class TestTodoserver(unittest.TestCase):
         # get list of tasks
         resp = self.client.get("/tasks/")
         self.assertEqual(200, resp.status_code)
-        checked_tasks = json_body(resp)
+        checked_tasks = json_body(resp) # convert response into dictionary
         self.assertEqual(3, len(checked_tasks))
     
     def test_delete_task(self):
@@ -61,7 +61,7 @@ class TestTodoserver(unittest.TestCase):
         }
         resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
         self.assertEqual(201, resp.status_code)
-        task_id = json_body(resp)["id"]
+        task_id = json_body(resp)["id"] # convert response into dictionary and get id
         # delete the task
         #resp = self.client.delete("/tasks/{:d}/".format(task_id))  # Python 3.5
         resp = self.client.delete(f"/tasks/{task_id}/")             # Python 3.6
@@ -70,6 +70,36 @@ class TestTodoserver(unittest.TestCase):
         resp = self.client.get(f"/tasks/{task_id}/")
         self.assertEqual(404, resp.status_code)
     
+    def test_modify_existing_task(self):
+        # create task to modify
+        new_task_data = {
+            "summary": "Get milk",
+            "description": "One gallon organic whole milk",
+        }
+        resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
+        self.assertEqual(201, resp.status_code)
+        task_id = json_body(resp)["id"] # convert response into dictionary and get id
+        
+        # update it
+        updated_task_data = {
+            "summary": "Get almond milk",
+            "description": "Half gallon vanilla flavored",
+        }
+        resp = self.client.put(f"/tasks/{task_id}/", data = json.dumps(updated_task_data))
+        self.assertEqual(200, resp.status_code)
+        
+        # verify change
+        resp = self.client.get(f"/tasks/{task_id}/")
+        check_task = json_body(resp)    # convert response into dictionary
+        self.assertEqual(
+            updated_task_data["summary"],
+            check_task["summary"]
+        )
+        self.assertEqual(
+            updated_task_data["description"],
+            check_task["description"]
+        )
+        
     def test_error_when_getting_nonexisting_tasks(self):
         resp = self.client.get("/tasks/42/")
         self.assertEqual(404, resp.status_code)
