@@ -40,6 +40,9 @@ class TaskStore():
     def task_details(self, task_id):
         #task = self.Session().query(Task).get(task_id) #SQLAlchemy 1.x
         task = self.Session().get(Task, task_id)        #SQLAlchemy 2.0
+        if task is None: # if no value is returned by get (returns None if no value)
+            return None
+        
         return {
             "id": task.id,
             "summary": task.summary,

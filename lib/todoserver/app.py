@@ -38,4 +38,6 @@ def create_task():
 @app.route("/tasks/<int:task_id>/")
 def task_details(task_id):
     task_info = app.store.task_details(task_id)
+    if task_info is None: # no value retured by get
+        return make_response("", 404) # make API response 404 per requirement
     return json.dumps(task_info)
