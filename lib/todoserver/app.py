@@ -44,5 +44,7 @@ def task_details(task_id):
 
 @app.route("/tasks/<int:task_id>/", methods = ["DELETE"])
 def delete_task(task_id):
-    app.store.delete_task(task_id)
-    return ""
+    deleted = app.store.delete_task(task_id)
+    if deleted:
+        return ""
+    return make_response("", 404)

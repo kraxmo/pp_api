@@ -38,8 +38,8 @@ class TaskStore():
         return task.id
     
     def task_details(self, task_id):
-        #task = self.Session().query(Task).get(task_id) #SQLAlchemy 1.x
-        task = self.Session().get(Task, task_id)        #SQLAlchemy 2.0
+        #task = self.Session().query(Task).get(task_id) # SQLAlchemy 1.x
+        task = self.Session().get(Task, task_id)        # SQLAlchemy 2.0
         if task is None: # if no value is returned by get (returns None if no value)
             return None
         
@@ -51,9 +51,16 @@ class TaskStore():
         
     def delete_task(self, task_id):
         session = self.Session()
-        task = session.query(Task).get(task_id)
-        session.delete(task)
-        session.commit()
+        #task = session.query(Task).get(task_id)        # SQLAlchemy 1.x
+        task = session.get(Task, task_id)               # SQLAlchemy 2.0
+        if task is None:
+            deleted = False
+        else:
+            deleted = True
+            session.delete(task)
+            session.commit()
+            
+        return deleted
     
     def _delete_all_tasks(self):
         session = self.Session()
