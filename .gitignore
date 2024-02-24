@@ -3,7 +3,6 @@
 act.bat
 dact.bat
 livecoded-api-server/
-tests/
 venv/
 __pycache__/
 temp/
