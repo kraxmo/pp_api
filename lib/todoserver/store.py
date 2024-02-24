@@ -71,8 +71,14 @@ class TaskStore():
         session = self.Session()
         #task = session.query(Task).get(task_id)        # SQLAlchemy 1.x
         task = session.get(Task, task_id)               # SQLAlchemy 2.0
-        task.summary = summary
-        task.description = description
-        session.add(task)
-        session.commit()
+        if task is None:
+            modified = False
+        else:
+            modified = True
+            task.summary = summary
+            task.description = description
+            session.add(task)
+            session.commit()
+        
+        return modified
     
