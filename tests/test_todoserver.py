@@ -10,9 +10,20 @@ def json_body(resp): # helper function to convert response into dictionary
     return json.loads(resp.data.decode("utf-8"))
 
 class TestTodoserver(unittest.TestCase):
+    def create_test_task(self):
+        # create task to modify
+        new_task_data = {
+            "summary": "Get milk",
+            "description": "One gallon organic whole milk",
+        }
+        resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
+        self.assertEqual(201, resp.status_code)
+        return json_body(resp) # convert response into dictionary and get id
+        
     def setUp(self):
         app.erase_all_test_data()
         self.client = app.test_client()
+        
         # verify test pre-conditions
         resp = self.client.get("/tasks/")
         self.assertEqual(200, resp.status_code)
@@ -20,14 +31,9 @@ class TestTodoserver(unittest.TestCase):
         
     def test_create_a_task_and_get_its_details(self):
         # create new task
-        new_task_data = {
-            "summary": "Get milk",
-            "description": "One gallon organic whole milk",
-        }
-        resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
-        self.assertEqual(201, resp.status_code)
-        data = json_body(resp)  # convert response into dictionary
+        data = self.create_test_task()
         self.assertIn("id", data)
+        
         # get task details
         task_id = data["id"]
         resp = self.client.get("/tasks/{:d}/".format(task_id))
@@ -54,14 +60,9 @@ class TestTodoserver(unittest.TestCase):
         self.assertEqual(3, len(checked_tasks))
     
     def test_delete_task(self):
-        # create task to delete
-        new_task_data = {
-            "summary": "Get milk",
-            "description": "One gallon organic whole milk",
-        }
-        resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
-        self.assertEqual(201, resp.status_code)
-        task_id = json_body(resp)["id"] # convert response into dictionary and get id
+        # create task to delete and get id
+        task_id = self.create_test_task()["id"]
+        
         # delete the task
         #resp = self.client.delete("/tasks/{:d}/".format(task_id))  # Python 3.5
         resp = self.client.delete(f"/tasks/{task_id}/")             # Python 3.6
@@ -71,14 +72,8 @@ class TestTodoserver(unittest.TestCase):
         self.assertEqual(404, resp.status_code)
     
     def test_modify_existing_task(self):
-        # create task to modify
-        new_task_data = {
-            "summary": "Get milk",
-            "description": "One gallon organic whole milk",
-        }
-        resp = self.client.post("/tasks/", data=json.dumps(new_task_data))
-        self.assertEqual(201, resp.status_code)
-        task_id = json_body(resp)["id"] # convert response into dictionary and get id
+        # create task to modify and get id
+        task_id = self.create_test_task()["id"]
         
         # update it
         updated_task_data = {
@@ -133,5 +128,6 @@ class TestTodoserver(unittest.TestCase):
                 self.assertIn("error", result)
                 self.assertEqual("Summary must be under 120 chars, without newlines", result["error"])
         
-    def test_error_when_updatitng_task_with_bad_summary(self):
-        pass
+    def test_error_when_updating_task_with_bad_summary(self):
+        # create task to modify
+        pass 
