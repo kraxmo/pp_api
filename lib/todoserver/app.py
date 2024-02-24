@@ -41,3 +41,8 @@ def task_details(task_id):
     if task_info is None: # no value retured by get
         return make_response("", 404) # make API response 404 per requirement
     return json.dumps(task_info)
+
+@app.route("/tasks/<int:task_id>/", methods = ["DELETE"])
+def delete_task(task_id):
+    app.store.delete_task(task_id)
+    return ""
