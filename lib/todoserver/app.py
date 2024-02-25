@@ -21,7 +21,7 @@ class TodoserverApp(Flask):
     def erase_all_test_data(self):
         assert self.testing # if true, TEST MODE; otherwise PROD MODE *BOMB*
         self.store._delete_all_tasks()
-        
+
 app = TodoserverApp(__name__)
 
 def validate_summary(view):
@@ -82,4 +82,3 @@ def delete_task(task_id):
         return ""
     
     return make_response("", 404)
-
